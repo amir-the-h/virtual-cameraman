@@ -118,7 +118,8 @@ async function toggleCamera() {
 async function switchCamera(ticks) {
   for (let i = 0; i < Math.abs(ticks); i++) {
     const info = await api("POST", ticks > 0 ? "/cameras/next" : "/cameras/previous");
-    camera.name = info.name || `Camera ${info.index}`;
+    if (!info.success) throw new Error(info.message || "camera switch failed");
+    camera.name = info.camera_name || `Camera ${info.active_camera}`;
   }
   drawAll(SWITCH);
 }
