@@ -1,0 +1,21 @@
+post_install() {
+  cat <<'MSG'
+==> Virtual Cameraman needs a face detection model (not packaged):
+      mkdir -p ~/.local/share/virtual-cameraman/models
+      curl -L -o ~/.local/share/virtual-cameraman/models/model.onnx \
+        https://github.com/akanametov/yolo-face/releases/download/1.0.0/yolov11n-face.onnx
+    then set inference.model_path to that file's full path in your config.
+
+==> Load the virtual camera device:
+      sudo modprobe v4l2loopback video_nr=10 card_label="Virtual Cameraman" exclusive_caps=1
+
+==> Config: mkdir -p ~/.config/virtual-cameraman && \
+      cp /usr/share/doc/virtual-cameraman/config.yaml.example ~/.config/virtual-cameraman/config.yaml
+    Service: systemctl --user enable --now virtualcam
+    deckd plugin: ln -s /usr/share/virtual-cameraman/me.the-h.virtualcameraman.sdPlugin ~/.config/deckd/plugins/
+MSG
+}
+
+post_upgrade() {
+  :
+}

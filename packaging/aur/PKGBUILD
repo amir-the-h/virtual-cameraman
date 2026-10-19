@@ -1,0 +1,48 @@
+# Maintainer: Amir Hosseini <amir@the-h.me>
+pkgname=virtual-cameraman
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Auto-framing virtual webcam: YOLO face tracking with smooth crop and zoom, v4l2loopback output"
+arch=('x86_64')
+url="https://github.com/amir-the-h/virtual-cameraman"
+license=('MIT')
+# gocv needs OpenCV 4.x; the official opencv package is 5.x
+depends=('opencv4' 'onnxruntime' 'V4L2LOOPBACK-MODULE' 'glibc' 'gcc-libs')
+makedepends=('go')
+optdepends=('onnxruntime-cuda: GPU inference (instead of onnxruntime-cpu)'
+            'nodejs: deckd Stream Deck plugin')
+install=virtual-cameraman.install
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('2752f71a0dd21c0fb8960519cfb55c963a02c7e844029433835e60e0c482ecf4')
+
+build() {
+  cd "$pkgname-$pkgver"
+  export CGO_CPPFLAGS="$CPPFLAGS"
+  export CGO_CFLAGS="$CFLAGS"
+  export CGO_CXXFLAGS="$CXXFLAGS"
+  export CGO_LDFLAGS="$LDFLAGS"
+  export GOFLAGS="-buildmode=pie -trimpath -mod=readonly -modcacherw"
+  go build -ldflags "-linkmode=external" -o virtualcam ./cmd/virtualcam
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  go test ./...
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 virtualcam "$pkgdir/usr/bin/virtualcam"
+
+  install -Dm644 config.yaml.example "$pkgdir/usr/share/doc/$pkgname/config.yaml.example"
+  install -Dm644 README.md -t "$pkgdir/usr/share/doc/$pkgname/"
+  install -Dm644 docs/*.md -t "$pkgdir/usr/share/doc/$pkgname/docs/"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+
+  # User service; reads ~/.config/virtual-cameraman/config.yaml
+  install -Dm644 systemd/virtualcam.user.service "$pkgdir/usr/lib/systemd/user/virtualcam.service"
+  sed -i 's|/usr/local/bin/virtualcam|/usr/bin/virtualcam|' "$pkgdir/usr/lib/systemd/user/virtualcam.service"
+
+  # deckd plugin
+  cp -r integrations/deckd/me.the-h.virtualcameraman.sdPlugin "$pkgdir/usr/share/$pkgname/"
+}
