@@ -1,0 +1,26 @@
+<svg width="144" height="144" viewBox="0 0 144 144" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+
+    <!-- Camera body -->
+    <rect x="40" y="55" width="64" height="44" rx="4" fill="#404040" stroke="#00A0DC"
+        stroke-width="2" />
+
+    <!-- Camera lens -->
+    <circle cx="72" cy="77" r="14" fill="#00A0DC" stroke="#0080B0" stroke-width="2" />
+    <circle cx="72" cy="77" r="8" fill="#1a1a1a" />
+
+    <!-- Camera viewfinder -->
+    <rect x="88" y="60" width="8" height="6" rx="1" fill="#00A0DC" />
+
+    <!-- Rotation arrow left (counter-clockwise) -->
+    <path d="M25 72 L35 62 L35 82 Z" fill="#FFD700" />
+    <path d="M35 72 C35 52 50 40 65 40" stroke="#FFD700" stroke-width="2" fill="none" />
+
+    <!-- Rotation arrow right (clockwise) -->
+    <path d="M119 72 L109 82 L109 62 Z" fill="#FFD700" />
+    <path d="M109 72 C109 92 94 104 79 104" stroke="#FFD700" stroke-width="2" fill="none" />
+
+    <!-- Camera switch indicator -->
+    <text x="72" y="125" font-family="Arial, sans-serif" font-size="12" fill="#00A0DC"
+        text-anchor="middle">SWITCH</text>
+</svg>
