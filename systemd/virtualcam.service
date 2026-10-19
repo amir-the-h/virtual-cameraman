@@ -1,0 +1,16 @@
+[Unit]
+Description=Virtual Cameraman
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/virtualcam
+Restart=on-failure
+RestartSec=2
+Environment=MODEL_DIR=/path/to/models
+
+# Optional: path to libonnxruntime.so if it is not in /usr/lib or /usr/local/lib
+# Environment=ONNXRUNTIME_SHARED_LIBRARY_PATH=/opt/onnxruntime/lib/libonnxruntime.so
+
+[Install]
+WantedBy=multi-user.target

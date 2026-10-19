@@ -1,0 +1,94 @@
+# Virtual Cameraman Configuration File
+# Copy this file to config.yaml and customize as needed
+# Or place it at ~/.config/virtual-cameraman/config.yaml
+#
+# Settings marked [live] are hot-reloaded while running: save the file and they
+# apply on the next frame. Everything else takes effect on the next capture start.
+
+# Camera settings
+camera:
+  # Multi-source support: Define multiple camera sources and switch between them at runtime
+  # Leave empty to use legacy single-camera mode (camera.index below)
+  sources:
+    - type: local          # Local webcam
+      device_id: 0         # Camera device index
+      width: 1280          # Optional: override resolution (uses defaults if omitted)
+      height: 720
+      fps: 60
+      format: ""           # Optional: FOURCC format (YUYV, MJPG, H264)
+      mirror: false        # Optional: mirror/flip output horizontally [live]
+      manual_exposure: 0   # Optional: lock exposure_time_absolute to this value (0 = auto-exposure)
+
+    # Example: RTSP stream from remote camera
+    # - type: rtsp
+    #   url: "rtsp://user:password@camera.local:554/stream"
+    #   mirror: false      # Optional: mirror/flip output horizontally
+
+    # You can add more sources here (local cameras, RTSP streams, etc.)
+
+  active_source: 0         # Index of active camera source (0-based)
+
+  # Legacy single-camera settings (used if sources list is empty)
+  index: 0          # Camera device index (0, 1, 2, ...)
+  width: 1280       # Capture width in pixels
+  height: 720       # Capture height in pixels
+  fps: 60           # Target FPS for capture and output
+  format: ""        # Camera format (FOURCC: YUYV, MJPG, H264). Empty = use camera default
+
+# Inference (face detection) settings
+inference:
+  confidence_threshold: 0.5  # Minimum confidence for face detection (0.0-1.0) [live]
+  nms_threshold: 0.4          # Non-maximum suppression IoU threshold (0.0-1.0) [live]
+  model_path: ""              # ONNX model path. If empty, looks for model_gpu.onnx or model.onnx in MODEL_DIR
+  width: 640                  # Model input width
+  height: 640                 # Model input height
+  detection_fps: 5.0          # Target detections per second (0 = every frame) [live]
+
+# Cameraman (auto-framing) settings, all [live]
+cameraman:
+  smoothing_factor: 0.05         # Smoothing factor for face tracking (0.0-1.0, lower = smoother)
+  zoom_min: 1.0                  # Minimum zoom level (1.0 = no zoom)
+  zoom_max: 1.5                  # Maximum zoom level
+  target_face_size_min: 0.25     # Target face size minimum as percentage of frame (0.25 = 25%). Face smaller than this will trigger zoom in
+  target_face_size_max: 0.50     # Target face size maximum as percentage of frame (0.50 = 50%). Face larger than this will trigger zoom out
+  zoom_smoothing_factor: 0.1     # Smoothing factor for zoom adjustments (0.0-1.0, lower = smoother zoom changes)
+  face_box_padding: 1.3          # Padding multiplier for face bounding box (1.3 = 30% larger). Expands box to account for tight detection boxes
+
+# Logging
+log:
+  level: info  # Log level: debug, info, warn, error
+
+# Virtual camera settings (Linux: v4l2loopback)
+virtual_camera:
+  enabled: true        # Enable virtual camera output
+  device: ""           # Virtual camera device path or index (e.g., /dev/video2 or 2). Empty = auto-detect
+  format: "YUYV"       # Pixel format: YUYV, MJPEG, or BGR4
+  output_width: 0      # Output resolution; 0 = same as camera. May differ from the
+  output_height: 0     # camera's aspect ratio (e.g. 1080x1920 for a portrait feed)
+
+# HTTP API server for remote control and state queries
+# Provides REST endpoints for querying state and toggling capture
+api:
+  enabled: true   # Enable HTTP API server
+  port: 8090      # API server port (default: 8090)
+
+# Capture control
+capture:
+  start_at_launch: true   # If false, start with capture paused; resume via API POST /toggle or SIGUSR1
+
+# Background processing
+background:
+  enabled: false              # Enable background blur or replacement
+  mode: "blur"                # Mode: "blur" or "replace"
+  blur_strength: 21           # Blur kernel size (must be odd, e.g., 15, 21, 31). Higher = more blur
+  image_path: ""              # Path to background image for replacement mode (empty = use solid color)
+  color: "#000000"            # Background color for replacement (hex format, e.g., "#000000" or "black")
+  face_padding: 1.3           # Padding around face for mask (1.3 = 30% larger). Larger = more area preserved around face
+
+# Other flags
+no_detection: false   # Disable face detection (camera only mode)
+
+# Debug/visualization
+debug:
+  show_boxes: false   # Draw detection (green) and crop region (blue) boxes on the output, for tuning framing [live]
+

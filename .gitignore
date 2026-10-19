@@ -1,0 +1,54 @@
+# Binaries
+bin/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+# Build artifacts
+build/
+dist/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+
+# Profiling data
+*.prof
+cpu.prof
+mem.prof
+
+# Model files (user-provided, not in repo)
+*.onnx
+models/
+
+# Config files with sensitive data
+config.yaml
+!config.yaml.example
+
+# Logs
+*.log
+
+# Agent documents
+.agent-documents/
+.github/copilot-instructions.md

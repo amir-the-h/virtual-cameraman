@@ -1,0 +1,18 @@
+[Unit]
+Description=Virtual Cameraman (User)
+After=default.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/virtualcam
+Restart=on-failure
+RestartSec=2
+# Optional: set MODEL_DIR to a directory containing model_gpu.onnx or model.onnx
+# as a fallback when inference.model_path is not set in config.yaml.
+# Example: Environment=MODEL_DIR=/home/user/.local/share/virtual-cameraman/models
+
+# Optional: path to libonnxruntime.so if it is not in /usr/lib or /usr/local/lib
+# Environment=ONNXRUNTIME_SHARED_LIBRARY_PATH=/opt/onnxruntime/lib/libonnxruntime.so
+
+[Install]
+WantedBy=default.target
