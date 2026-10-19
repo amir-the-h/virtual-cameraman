@@ -23,8 +23,11 @@ Discord or a browser.
   output resolution, including a different aspect ratio from the camera.
 - **Multiple sources**: local webcams and RTSP streams, switchable at runtime.
 - **Background blur or replacement** around the detected face.
-- **Headless control**: localhost HTTP API (Stream Deck, scripts, Home
-  Assistant), `SIGUSR1` to toggle, systemd units.
+- **Headless control**: localhost HTTP API (scripts, Home Assistant),
+  `SIGUSR1` to toggle, systemd units.
+- **Hardware buttons**: a ready-made plugin for
+  [deckd](https://github.com/amir-the-h/deckd) gives you a capture on/off key
+  and a camera-switching dial on a Stream Deck.
 - **Live tuning**: framing and detection settings hot-reload from the YAML
   config on save.
 - **Zero idle footprint**: when capture is off, the video pipeline process
@@ -153,6 +156,24 @@ kill -USR1 "$(pidof virtualcam)"          # same as /toggle
 The API listens on localhost only and rejects requests from web pages. See
 [docs/API.md](docs/API.md) and [docs/MULTI_CAMERA.md](docs/MULTI_CAMERA.md).
 
+### Stream Deck control with deckd
+
+[**deckd**](https://github.com/amir-the-h/deckd) is my lightweight Linux daemon
+for macro-key decks. It runs Elgato-format plugins without the official app
+and has a web UI for laying out pages. This repo ships a deckd plugin in
+[`integrations/deckd`](integrations/deckd):
+
+- **Capture On/Off** key: starts or stops the virtual camera, and lights up
+  while it's running.
+- **Switch Camera** dial: turn to cycle through your camera sources.
+
+```bash
+ln -s "$PWD/integrations/deckd/me.the-h.virtualcameraman.sdPlugin" ~/.config/deckd/plugins/
+systemctl --user restart deckd
+```
+
+If you have a Stream Deck and use Linux, give deckd a try.
+
 ### Running as a service
 
 ```bash
@@ -201,6 +222,7 @@ internal/virtualcam   v4l2loopback writer and pixel format conversion
 internal/api          HTTP API and loopback guard
 internal/config       YAML config, defaults, hot-reload watcher
 internal/cuda         optional CUDA resize (build tag `cuda`)
+integrations/deckd    Stream Deck plugin for deckd
 ```
 
 Contributions are welcome; see [CONTRIBUTING.md](.github/CONTRIBUTING.md).
