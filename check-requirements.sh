@@ -74,7 +74,7 @@ for dep in "${MISSING_DEPS[@]}"; do
     case $dep in
         opencv)
             echo "✗ OpenCV 4.12: distro packages are often a different version."
-            echo "    Build it with gocv's installer: https://gocv.io/getting-started/linux/"
+            echo "    Run 'make opencv' to build a private copy the app links against."
             ;;
         v4l2loopback)
             echo "✗ v4l2loopback:"
@@ -90,8 +90,8 @@ done
 for warn in "${WARNINGS[@]}"; do
     case $warn in
         opencv-version)
-            echo "⚠ Install OpenCV 4.12 (https://gocv.io/getting-started/linux/), or build"
-            echo "  and test inside ghcr.io/hybridgroup/opencv:4.12.0"
+            echo "⚠ Run 'make opencv' to build a private OpenCV 4.12 that make build/test"
+            echo "  use automatically (the system OpenCV is left alone)"
             ;;
         onnxruntime)
             echo "⚠ ONNX Runtime 1.23.x: https://github.com/microsoft/onnxruntime/releases"

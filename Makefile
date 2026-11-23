@@ -1,4 +1,4 @@
-.PHONY: build build-cuda test lint clean run help package install check-requirements install-systemd-system install-systemd-user uninstall-systemd-system uninstall-systemd-user
+.PHONY: build build-cuda opencv test lint clean run help package install check-requirements install-systemd-system install-systemd-user uninstall-systemd-system uninstall-systemd-user
 
 BINARY_NAME=virtualcam
 BIN_DIR=bin
@@ -6,9 +6,23 @@ CMD_DIR=cmd/virtualcam
 MAIN_FILE=$(CMD_DIR)/main.go
 VERSION ?= 1.0.0
 
+# Private OpenCV (scripts/build-opencv.sh). When it is installed, builds and
+# tests link against it instead of the system OpenCV, with an rpath so the
+# binary finds it at runtime. Otherwise the system opencv4 is used (CI).
+OPENCV_VERSION ?= 4.12.0
+OPENCV_PREFIX ?= /opt/virtualcam/opencv-$(OPENCV_VERSION)
+ifneq ($(wildcard $(OPENCV_PREFIX)/lib/pkgconfig/opencv4.pc),)
+export PKG_CONFIG_PATH := $(OPENCV_PREFIX)/lib/pkgconfig
+export CGO_LDFLAGS := -Wl,-rpath,$(OPENCV_PREFIX)/lib $(CGO_LDFLAGS)
+OPENCV_CHECK := true
+else
+OPENCV_CHECK := pkg-config --exists opencv4 || { echo "✗ OpenCV 4.12 not found in $(OPENCV_PREFIX) or the system. Run 'make opencv' first." >&2; exit 1; }
+endif
+
 help:
 	@echo "Virtual Cameraman - Makefile targets"
 	@echo "  make check-requirements - Check if all dependencies are installed"
+	@echo "  make opencv      - Build the private OpenCV $(OPENCV_VERSION) into $(OPENCV_PREFIX)"
 	@echo "  make build       - Build the binary (no CUDA)"
 	@echo "  make build-cuda  - Build with CUDA support (-tags cuda)"
 	@echo "  make run         - Build and run"
@@ -26,13 +40,18 @@ help:
 check-requirements:
 	@./check-requirements.sh
 
+opencv:
+	OPENCV_VERSION=$(OPENCV_VERSION) OPENCV_PREFIX=$(OPENCV_PREFIX) ./scripts/build-opencv.sh
+
 build:
+	@$(OPENCV_CHECK)
 	@mkdir -p $(BIN_DIR)
 	@echo "Building $(BINARY_NAME)..."
 	go build -o $(BIN_DIR)/$(BINARY_NAME) $(MAIN_FILE)
 	@echo "✓ Built: $(BIN_DIR)/$(BINARY_NAME)"
 
 build-cuda:
+	@$(OPENCV_CHECK)
 	@mkdir -p $(BIN_DIR)
 	@echo "Building $(BINARY_NAME) with CUDA support..."
 	go build -tags cuda -o $(BIN_DIR)/$(BINARY_NAME) $(MAIN_FILE)
@@ -43,6 +62,7 @@ run: build
 	./$(BIN_DIR)/$(BINARY_NAME)
 
 test:
+	@$(OPENCV_CHECK)
 	@echo "Running tests..."
 	go test -v ./...
 

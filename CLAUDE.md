@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 ```bash
+make opencv         # Build private OpenCV 4.12 into /opt/virtualcam/opencv-4.12.0
 make build          # Build bin/virtualcam
 make build-cuda     # Build with -tags cuda (OpenCV CUDA resize)
 make run            # Build and run
@@ -28,7 +29,7 @@ VIRTUALCAM_TEST_MODEL=/path/yolov11n-face.onnx VIRTUALCAM_TEST_FACE_IMAGE=/path/
   go test ./internal/inference -run RealModel -v
 ```
 
-Tests require OpenCV **4.12** (what gocv v0.42 targets). OpenCV 5 is ABI-incompatible with gocv v0.42 (Mat type constants changed). On such hosts, run tests in `ghcr.io/hybridgroup/opencv:4.12.0`, the image CI uses.
+Builds and tests require OpenCV **4.12** (what gocv v0.42 targets). OpenCV 5 is ABI-incompatible with gocv v0.42 (Mat type constants changed, APIs removed). `make opencv` (`scripts/build-opencv.sh`) builds a private 4.12 into `OPENCV_PREFIX` (default `/opt/virtualcam/opencv-4.12.0`); when it exists, the Makefile exports `PKG_CONFIG_PATH` and an rpath in `CGO_LDFLAGS`, so go through `make build`/`make test` rather than bare `go` commands (or set those two variables yourself). Without it, the system `opencv4` is used, as in CI (`ghcr.io/hybridgroup/opencv:4.12.0`). Never patch `vendor/` for another OpenCV version.
 
 **Environment variables:**
 - `MODEL_DIR`: directory for ONNX model files (prefers `model_gpu.onnx`, then `model.onnx`); falls back to `ONNXRUNTIME_HOME`

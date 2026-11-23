@@ -69,8 +69,10 @@ to.
 - **Linux** with the `v4l2loopback` kernel module
 - **OpenCV 4.12**, the version [gocv](https://gocv.io) v0.42 targets. Distro
   packages are often a different version; OpenCV 5 is not compatible.
-  [gocv's installer](https://gocv.io/getting-started/linux/) builds the right
-  one.
+  `make opencv` builds a private copy in `/opt/virtualcam/opencv-4.12.0` that
+  `make build` and `make test` then link against (with an rpath), leaving the
+  system OpenCV free to update. It needs CMake, Ninja and the GStreamer
+  development files. Override the location with `OPENCV_PREFIX=...`.
 - **ONNX Runtime 1.23.x**: the CPU build, or the GPU build for CUDA
 - **Go 1.25+** to build
 - Optional: an NVIDIA GPU with CUDA and cuDNN ([docs/CUDA.md](docs/CUDA.md))
@@ -195,8 +197,9 @@ make lint         # gofmt check + go vet
 make test         # unit tests
 ```
 
-Tests need OpenCV 4.12. If your system has another version, run them in the
-image CI uses:
+Tests need OpenCV 4.12: `make test` uses the private copy from `make opencv`
+when it is installed. Plain `go test` doesn't; use `make test`, or run them in
+the image CI uses:
 
 ```bash
 docker run --rm -v "$PWD":/src -w /src ghcr.io/hybridgroup/opencv:4.12.0 go test -race ./...
